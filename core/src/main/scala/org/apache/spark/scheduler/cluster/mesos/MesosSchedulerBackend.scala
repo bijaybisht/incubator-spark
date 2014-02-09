@@ -130,14 +130,13 @@ private[spark] class MesosSchedulerBackend(
   private def createExecArg(): Array[Byte] = {
     if (execArgs == null) {
       val props = new HashMap[String, String]
-      val iterator = System.getProperties.entrySet.iterator
-      while (iterator.hasNext) {
-        val entry = iterator.next
-        val (key, value) = (entry.getKey.toString, entry.getValue.toString)
+      for ((key,value) <- sc.conf.getAll) {
         if (key.startsWith("spark.")) {
           props(key) = value
         }
       }
+
+
       // Serialize the map as an array of (String, String) pairs
       execArgs = Utils.serialize(props.toArray)
     }
